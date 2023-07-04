@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(ini_parser)
 
-add_executable(ini_configs_parse main.cpp file.ini parser.h parser.cpp file.ini)
+add_executable(ini_configs_parse main.cpp parser.h parser.cpp)

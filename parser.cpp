@@ -1,7 +1,7 @@
 #include "parser.h"
 
 ini_parser::ini_parser(const char filename[]) {
-	config = std::make_unique<std::ifstream>("file.ini");
+	config = std::make_shared<std::ifstream>(filename);
 	if (!config->is_open()) throw std::logic_error("configuration file is couldn't be open");
 	config->seekg(0);
 
@@ -76,9 +76,27 @@ ini_parser::ini_parser(const char filename[]) {
 	}
 }
 
-void ini_parser::show_data() const {
+ini_parser& ini_parser::operator=(const ini_parser& other_parser) {
+	config = other_parser.config;
+	data = other_parser.data;
+	bad_syntax_lines = other_parser.bad_syntax_lines;
+
+	return *this;
+}
+
+ini_parser& ini_parser::operator=(ini_parser&& other_parser) noexcept {
+	config = std::move(other_parser.config);
+	data = std::move(other_parser.data);
+	bad_syntax_lines = std::move(other_parser.bad_syntax_lines);
+
+	return *this;
+}
+
+void ini_parser::info() const {
+	std::cout << "#####\nData:" << std::endl;
+	
 	for (const auto& sec : data) {
-		std::cout << sec.first << ":\n";
+		std::cout << '[' << sec.first << "]\n";
 		for (const auto& val : sec.second) {
 			std::cout << val.first << " = ";
 
@@ -96,10 +114,8 @@ void ini_parser::show_data() const {
 			}
 		}
 	}
-}
 
-void ini_parser::bad_syntax() const {
-	std::cout << "Lines, with bad syntax: ";
+	std::cout << "#######################\nLines, with bad syntax: ";
 	std::cout << *bad_syntax_lines.begin();
 	for (auto itr = ++bad_syntax_lines.begin(); itr != bad_syntax_lines.end(); ++itr) {
 		std::cout << ", " << *itr;
